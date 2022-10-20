@@ -1,0 +1,21 @@
+
+Réponses TP5
+
+
+2) Les lignes 1-7 déclarent un nouveau type produit nommé, "movie".
+
+3) La ligne 9 déclare un type somme soit d'un nom de film, soit un problème soit la fin du fichier.
+
+4) Le type de input_movie est : in_channel -> res
+Cette fonction convertit tous les films correctements encodés de la ligne entrée (avec des ;) en type movie ; 
+renvoie invalide si ils ne correspondent pas et Eof à la fin du fichier.
+
+5) Le type de load_movie est : string -> movie list
+Cette fonction parcours le fichier et applique input_movie à chaque ligne et à chaque fois que cela
+donne un type movie du type res ça l'ajoute à une liste chaînée. Elle renvoie donc la liste de tous les films
+au type movie.
+
+close_in : in_channel -> unit
+
+
+6) La ligne 43 met la liste des films de "movie.csv" dans la varaibles movies.

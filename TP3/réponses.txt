@@ -1,0 +1,17 @@
+
+
+(a) Le programme est mal typée, f : int -> int * int et on lui donne comme arg int*int.
+
+(b) bien typée, f : t -> t (on va incrémenter de 1 si c'est un int et le négationner si c'est un bool).
+
+(c) mal typé, erreur ligne 4,5. Retourne soit int soit bool, pas un tpe t.
+
+(d) bien typé, f : 'a -> 'a * 'a
+g : 'b * 'b -> 'b
+'a = 'b = int => u = 42.
+
+(e) mal typé, f : (int -> 'a -> 'a) -> int -> 'a -> 'a
+Pour x, 'a = int et (µ) : int->int->int donc ok
+
+add_str : int -> string -> string    (can't apply string_of_int to a string but that's probably a typo)
+Pour y, on appelle add_str avec string int, ce qui est aps le bon sens donc erreur.
