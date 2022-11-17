@@ -30,6 +30,9 @@ all: $(BINS)
   @echo "Creating object files..."
   $(CP) $(CFLAGS) -c $<
 
+#Not sure if it works but is intented to start a command line version of the executables to test them
+test : *.cmo
+  rlwrap ocaml -noinit $< -open $@
 
 clean:
   @echo "Cleaning up..."
