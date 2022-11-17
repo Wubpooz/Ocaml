@@ -22,7 +22,7 @@ BINS := $(SRCS:%.ml=%)
 all: $(BINS)
 
 %: %.cmo
-	$(LD) $(LDFLAGS) $@ -o $< 
+	$(LD) $(LDFLAGS) -o $@ $<  
 
 %.cmo: %.ml
 	@echo "Creating object files..."
@@ -34,4 +34,4 @@ test : *.cmo
 
 clean:
 	@echo "Cleaning up..."
-	$(RM) *.cmo $(BINS)
+	$(RM) *.cmo *.cmi $(BINS)
