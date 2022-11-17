@@ -23,7 +23,7 @@ BINS := $(SRCS:%.ml=%)
 all: $(BINS)
 
 %: %.cmo
-  $(LD) $(LDFLAGS) -o $@ $<
+  $(LD) $(LDFLAGS) $@ -o $<
   
 
 %.cmo: %.ml
