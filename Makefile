@@ -19,21 +19,19 @@ RM = rm -rvf
 SRCS := $(wildcard *.ml)
 BINS := $(SRCS:%.ml=%)
 
-
 all: $(BINS)
 
 %: %.cmo
-    $(LD) $(LDFLAGS) $@ -o $<
-  
+	$(LD) $(LDFLAGS) $@ -o $< 
 
 %.cmo: %.ml
-    @echo "Creating object files..."
-    $(CP) $(CFLAGS) -c $<
+	@echo "Creating object files..."
+	$(CP) $(CFLAGS) -c $<
 
 #Not sure if it works but is intented to start a command line version of the executables to test them
 test : *.cmo
-    rlwrap ocaml -noinit $< -open $@
+	rlwrap ocaml -noinit $< -open $@
 
 clean:
-    @echo "Cleaning up..."
-    $(RM) *.cmo $(BINS)
+	@echo "Cleaning up..."
+	$(RM) *.cmo $(BINS)
