@@ -32,6 +32,9 @@ all: $(BINS)
 test : *.cmo
 	rlwrap ocaml -noinit $< -open $@
 
+run : $(BINS)
+	./$<
+
 clean:
 	@echo "Cleaning up..."
 	$(RM) *.cmo *.cmi $(BINS)
