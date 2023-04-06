@@ -1,5 +1,5 @@
 (*------------------------------------- Exercice 1 -------------------------------------*)
-
+(*
 type binop = And | Or | Imp
 type fmla = True | False | Var of int | Not of fmla | Bin of binop*fmla*fmla
 
@@ -13,7 +13,7 @@ let rec print_fmla f =
   | Bin(op,f1,f2) -> Printf.printf "( "; print_fmla f1; print_binop op; print_fmla f2; Printf.printf") ";
 ;;
 
-(*
+
 (*1*)
 let rec contains i f = 
   match f with  
@@ -78,6 +78,7 @@ Printf.printf "%b\n" (is_nnf (nnf(Not(Bin(And,Bin(Imp,Var(5),Var(3)),False)))));
 
 
 (*------------------------------------- Exercice 2 -------------------------------------*)
+(*
 let s_not f = match f with
   True -> False
   | False -> True
@@ -113,7 +114,7 @@ let s_imp f1 f2 =
   | _ -> Bin(Imp,f1,f2)
 ;;
 
-print_fmla (Bin ( Imp , Not ( Var 0) , Bin ( And , Var 1, False ))); ;Printf.printf "\n";;
+print_fmla (Bin ( Imp , Not ( Var 0) , Bin ( And , Var 1, False )));; Printf.printf "\n";;
 print_fmla (s_imp ( s_not ( Var 0)) ( s_and ( Var 1) False ));; Printf.printf "\n";;
 
 
@@ -123,9 +124,48 @@ let s_xor f1 f2 = s_or (s_and f1 (s_not f2)) (s_and (s_not f1) f2);;
 
 
 (*4*)
+let rec simplify f =
+  match f with
+    True -> True
+    | False -> False
+    | Var(x) -> Var(x)
+    | Not(f) -> s_not (simplify f)
+    | Bin(op,f1,f2) -> let sf1=simplify f1 in let sf2=simplify f2 in match op with And -> s_and sf1 sf2 | Or -> s_or sf1 sf2 | Imp -> s_imp sf1 sf2
+;;
+
+print_fmla (simplify (Bin ( Imp , Not ( Var 0) , Bin ( And , Var 1, False ))));; Printf.printf "\n";;
+print_fmla (simplify (Bin(And,Bin(Or,Not(Var(5)),Var(3)),False)));; Printf.printf "\n";;
+
+*)
+
+(*------------------------------------- Exercice 3 -------------------------------------*)
+(*
+(*1*)
+type exp = CST of int | VAR of int | UMINUS of exp | PLUS of exp*exp | MINUS of exp*exp | TIMES of exp*exp (*int of VAR is the indice*)
+
+(*2*)
+let rec constant e =
+  match e with
+  CST(_) -> true
+  | VAR(_) -> false
+  | UMINUS(e) -> constant e
+  | PLUS(e1,e2) | MINUS(e1,e2) | TIMES(e1,e2) -> constant e1 && constant e2
+;;
 
 
+(*3*)
+let rec eval e arr =
+  match e with
+  CST(x) -> x
+  | VAR(i) -> arr.(i)
+  | UMINUS(e) -> -(eval e arr)
+  | PLUS(e1,e2) -> (eval e1 arr)+(eval e2 arr)
+  | MINUS(e1,e2) -> (eval e1 arr)-(eval e2 arr)
+  | TIMES(e1,e2) -> (eval e1 arr)*(eval e2 arr)
+;;
 
+Printf.printf "%d\n" (eval (TIMES(CST(3),PLUS(VAR(1),UMINUS(VAR(0)))))  [|1;2;3|]);; (*  3* (2+ -1) *)
+*)
 
 (*------------------------------------- Exercice 4 -------------------------------------*)
 (*
