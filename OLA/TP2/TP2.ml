@@ -1,5 +1,5 @@
 (*------------------------------------- Exercice 1 -------------------------------------*)
-(*
+
 type binop = And | Or | Imp
 type fmla = True | False | Var of int | Not of fmla | Bin of binop*fmla*fmla
 
@@ -13,7 +13,7 @@ let rec print_fmla f =
   | Bin(op,f1,f2) -> Printf.printf "( "; print_fmla f1; print_binop op; print_fmla f2; Printf.printf") ";
 ;;
 
-
+(*
 (*1*)
 let rec contains i f = 
   match f with  
@@ -77,30 +77,74 @@ Printf.printf "%b\n" (is_nnf (nnf(Not(Bin(And,Bin(Imp,Var(5),Var(3)),False)))));
 *)
 
 
+(*------------------------------------- Exercice 2 -------------------------------------*)
+let s_not f = match f with
+  True -> False
+  | False -> True
+  | Not f' -> f'
+  | Var(x) -> Var(x)    (*l'énoncé se plante ?*)
+  | _ -> Not f
+
+(*1*)
+let s_and f1 f2 =
+  match f1,f2 with
+    True, True -> True
+    | False, _ | _, False -> False
+    | True, _ -> f2
+    | _, True -> f1
+    | _ -> Bin(And,f1,f2)
+;;
 
 
+(*2*)
+let s_or f1 f2 = 
+  match f1,f2 with
+  False, False -> False
+  | True, _ | _, True -> True
+  | False, _ -> f2
+  | _, False -> f1
+  | _ -> Bin(Or,f1,f2)
+;;
+
+let s_imp f1 f2 =
+  match f1, f2 with
+  False,_ | True,True -> True
+  | Var(x),_ -> Var(x)  (*l'énoncé se plante ?*)
+  | _ -> Bin(Imp,f1,f2)
+;;
+
+print_fmla (Bin ( Imp , Not ( Var 0) , Bin ( And , Var 1, False ))); ;Printf.printf "\n";;
+print_fmla (s_imp ( s_not ( Var 0)) ( s_and ( Var 1) False ));; Printf.printf "\n";;
 
 
+(*3*)
+let s_iff f1 f2 = s_and (s_imp f1 f2) (s_imp f2 f1);;
+let s_xor f1 f2 = s_or (s_and f1 (s_not f2)) (s_and (s_not f1) f2);;
+
+
+(*4*)
 
 
 
 
 (*------------------------------------- Exercice 4 -------------------------------------*)
-
-type regexp = Eps | Char of char | Alt of regexp*regexp | Concat of regexp*regexp | Star of regexp
+(*
+type regex = Empty | Eps | Char of char | Alt of regex*regex | Concat of regex*regex | Star of regex
 let rec print_regex e = 
   match e with 
-    Eps -> Printf.printf "ɛ" 
+    Empty -> ()
+    | Eps -> Printf.printf "ɛ" 
     | Char(c) -> Printf.printf"%c" c 
     | Alt(e1,e2) -> Printf.printf "("; print_regex e1; Printf.printf "|";print_regex e2; Printf.printf ")";
     | Concat(e1,e2) -> print_regex e1; print_regex e2;
-    | Star(e) -> print_regex e; Printf.printf "*";
+    | Star(e) -> Printf.printf "("; print_regex e; Printf.printf ")*";
 ;;
 
 (*1*)
 let rec espilon exp=
   match exp with
-    Eps -> true
+    Empty -> false
+    | Eps -> true
     | Char(_) -> false
     | Star(_) -> true
     | Alt(e1,e2) -> espilon e1 || espilon e2
@@ -113,7 +157,8 @@ Printf.printf "%b\n" (espilon (Concat(Alt(Char('a'),Char('b')),Star(Char('c'))))
 (*2*)
 let rec first a exp =
   match exp with
-    Eps -> false
+    Empty -> failwith "Empty"
+    | Eps -> false
     | Char(c) -> c=a
     | Star(e) -> first a e
     | Alt(e1,e2) -> first a e1 || first a e2
@@ -122,7 +167,8 @@ let rec first a exp =
 
 let rec last a exp =
   match exp with
-    Eps -> false
+    Empty -> failwith "Empty"
+    | Eps -> false
     | Char(c) -> c=a
     | Star(e) -> last a e
     | Alt(e1,e2) -> last a e1 || last a e2
@@ -135,14 +181,56 @@ Printf.printf "%b\n" (last 'b' (Concat(Alt(Char('a'),Char('b')),Star(Char('c')))
 
 
 (*3*)
-let rec follow a b exp =  (*faudrait faire un || avec l'expression où Star -> Eps*)
+let rec follow a b exp =
   match exp with
-    Eps -> true (*bcs if two letters are separated by eps they are technicaly consecutively*)
+    Empty -> failwith "Empty"
+    | Eps -> true
     | Char(c) -> false
     | Star(e) -> follow a b e
     | Alt(e1,e2) -> follow a b e1 || follow a b e2
-    | Concat(e1,e2) -> match e1,e2 with Char(c1),Char(c2) -> c1=a && c2=b |_ -> follow a b e1 || follow a b e2
+    | Concat(e1,e2) -> (last a e1 && first b e2) || follow a b e1 || follow a b e2
 ;;
 
+let rec collapse_star_to_eps exp = match exp with
+  Empty -> Empty
+  | Eps -> Eps
+  | Char(c) -> Char(c)
+  | Star(e) -> Eps
+  | Alt(e1,e2) -> Alt(collapse_star_to_eps e1, collapse_star_to_eps e2)
+  | Concat(e1,e2) -> Concat(collapse_star_to_eps e1, collapse_star_to_eps e2)
+;;
+let follow a b exp = follow a b exp || follow a b (collapse_star_to_eps exp);; (*takes into acocunt that star->eps is right*)
 
-Printf.printf "%b\n" (follow 'a' 'c' (Concat(Char('d'),Concat(Alt(Char('a'),Char('b')),Star(Char('c'))))));;
+print_regex (Concat(Char('d'),Concat(Alt(Char('a'),Char('b')),Concat(Star(Concat(Star(Char('f')),Star(Char('c')))),Char('e'))))); Printf.printf "\n";
+print_regex (collapse_star_to_eps (Concat(Char('d'),Concat(Alt(Char('a'),Char('b')),Concat(Star(Concat(Star(Char('f')),Star(Char('c')))),Char('e')))))); Printf.printf "\n";
+Printf.printf "%b\n" (follow 'a' 'c' (Concat(Char('d'),Concat(Alt(Char('a'),Char('b')),Concat(Star(Concat(Star(Char('f')),Star(Char('c')))),Char('e'))))));;
+
+
+(*4*)
+
+
+(*5*)
+let rec derive exp a = 
+  match exp with
+    Empty -> Empty
+    | Eps -> Empty
+    | Char(c) -> if c=a then Eps else Empty
+    | Star(e) -> Concat(derive e a,e)
+    | Alt(e1,e2) -> Alt(derive e1 a,derive e2 a)
+    | Concat(e1,e2) -> if espilon e1 then Alt(Concat(derive e1 a,e2),derive e2 a) else Concat(derive e1 a,e2)
+;;
+
+print_regex (derive (Alt(Concat(Char('a'),Concat(Char('b'),Char('c'))), Alt(Concat(Char('a'),Char('d')),Alt(Concat(Char('e'),Concat(Char('f'),Char('g'))),Char('a'))))) 'a');; Printf.printf "\n";;
+(*result is not as expected (bc|d|eps) so I guess it's wrong but can't figure out why*)
+
+
+(*6*)
+let rec accept exp s = 
+  match s with
+    [] -> espilon exp
+    | a::s -> accept (derive exp a) s
+;;
+
+Printf.printf "%b\n" (accept (Alt(Concat(Char('a'),Concat(Char('b'),Char('c'))), Alt(Concat(Char('a'),Char('d')),Alt(Concat(Char('e'),Concat(Char('f'),Char('g'))),Char('a'))))) ['a';'b';'c']);;
+
+*)
