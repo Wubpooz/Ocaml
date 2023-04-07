@@ -33,7 +33,8 @@ let rec elim_imp f =
     | False -> False
     | Var(x) -> Var(x)
     | Not(nf) -> Not(elim_imp nf)
-    | Bin(op,f1,f2) -> if op=Imp then Bin(Or,Not(elim_imp f1),elim_imp f2) else Bin(op,elim_imp f1,elim_imp f2)
+    | Bin(Imp,f1,f2) -> Bin(Or,Not(elim_imp f1),elim_imp f2)
+    | Bin(op,f1,f2) ->Bin(op,elim_imp f1,elim_imp f2)
 ;;
 
 print_fmla (elim_imp (Bin(And,Bin(Imp,Var(5),Var(3)),False)));; Printf.printf "\n";;
@@ -42,9 +43,9 @@ print_fmla (elim_imp (Bin(And,Bin(Imp,Var(5),Var(3)),False)));; Printf.printf "\
 (*3*)
 let rec is_nnf f =
   match f with
-    True | False | Var(_) -> true
-  | Not(nf) -> (match nf with Var(_) -> true | _ -> false)
-  | Bin(_,f1,f2) -> is_nnf f1 && is_nnf f2
+    True | False | Var(_) | Not(Var(_)) -> true
+  | Bin((And|Or),f1,f2) -> is_nnf f1 && is_nnf f2
+  | _ -> false
 ;;
 
 Printf.printf "%b\n" (is_nnf (Not(Bin(And,Bin(Imp,Var(5),Var(3)),False))));;
