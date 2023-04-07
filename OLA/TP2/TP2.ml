@@ -69,7 +69,7 @@ print_fmla (neg_nnf (Bin(And,Bin(Or,Not(Var(5)),Var(3)),False)));; Printf.printf
 
 (*5*)
 (*let nnf f = neg_nnf (neg_nnf (elim_imp f));;    shouldn't work bcs neg_nnf works iff f is nnf ?*)
-(*Alt_version, working ?*)
+(*Alt_version, working ?
 let rec propagate_not f = (*without Imp*)
   match f with
   True -> True
@@ -83,10 +83,20 @@ let rec propagate_not f = (*without Imp*)
                   | Bin(op,f1,f2) -> if op=And then Bin(Or, propagate_not (Not(f1)),propagate_not (Not(f2))) else Bin(And,propagate_not (Not(f1)),propagate_not (Not(f2))))
   | Bin(op,f1,f2) -> Bin(op, propagate_not f1, propagate_not f2)
 ;;
-let nnf = propagate_not (elim_imp f));;
+let nnf = propagate_not (elim_imp f));; *)
+
+let rec nnf f = (*HAVE TO TEST IF COMPILES *)
+  match f with 
+  | True -> True | False -> False | Var(x) -> Var(x) 
+  | Not(nf) -> neg_nnf (nnf f) (*bcs f is now in nnf*) 
+  | Bin(Imp,f1,f2) -> Bin(Or,neg_nnf (nnf f1), nnf f2)
+  | Bin(op,f1,f2) -> Bin(op,nnf f1,nnf f2) 
+;;
 
 Printf.printf "%b\n" (is_nnf (nnf(Not(Bin(And,Bin(Imp,Var(5),Var(3)),False)))));;
 
+(*6*)
+(*complexité en 2*neg_nnf + elim_imp = 2*O(n) + O(n) = O*)
 
 
 (*6*)
