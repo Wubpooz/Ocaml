@@ -55,7 +55,7 @@ let rec neg_nnf f =
   match f with
     True -> False
     | False -> True
-    | Var(x) -> Var(x)
+    | Var(x) -> Not(Var(x))
     | Not(nf) -> nf
     | Bin(op,f1,f2) -> (match op with 
                         | And -> Bin(Or,neg_nnf f1,neg_nnf f2) 
@@ -67,7 +67,7 @@ print_fmla (neg_nnf (Bin(And,Bin(Or,Not(Var(5)),Var(3)),False)));; Printf.printf
 
 
 (*5*)
-let rec nnf f = neg_nnf (neg_nnf (elim_imp f));;
+let rec nnf f = neg_nnf (neg_nnf (elim_imp f));;    (*shouldn't work bcs neg_nnf works iff f is nnf ?*)
 
 Printf.printf "%b\n" (is_nnf (nnf(Not(Bin(And,Bin(Imp,Var(5),Var(3)),False)))));;
 
