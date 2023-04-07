@@ -1,5 +1,5 @@
 (*------------------------------------- Exercice 1 -------------------------------------*)
-(*
+
 type binop = And | Or | Imp
 type fmla = True | False | Var of int | Not of fmla | Bin of binop*fmla*fmla
 
@@ -74,11 +74,11 @@ Printf.printf "%b\n" (is_nnf (nnf(Not(Bin(And,Bin(Imp,Var(5),Var(3)),False)))));
 
 (*6*)
 (*complexité en 2*neg_nnf + elim_imp = 2*O(n) + O(n) = O(n) *)
-*)
+
 
 
 (*------------------------------------- Exercice 2 -------------------------------------*)
-(*
+
 let s_not f = match f with
   True -> False
   | False -> True
@@ -136,10 +136,9 @@ let rec simplify f =
 print_fmla (simplify (Bin ( Imp , Not ( Var 0) , Bin ( And , Var 1, False ))));; Printf.printf "\n";;
 print_fmla (simplify (Bin(And,Bin(Or,Not(Var(5)),Var(3)),False)));; Printf.printf "\n";;
 
-*)
 
 (*------------------------------------- Exercice 3 -------------------------------------*)
-(*
+
 (*1*)
 type exp = CST of int | VAR of int | UMINUS of exp | PLUS of exp*exp | MINUS of exp*exp | TIMES of exp*exp (*int of VAR is the indice*)
 
@@ -165,10 +164,10 @@ let rec eval e arr =
 ;;
 
 Printf.printf "%d\n" (eval (TIMES(CST(3),PLUS(VAR(1),UMINUS(VAR(0)))))  [|1;2;3|]);; (*  3* (2+ -1) *)
-*)
+
 
 (*------------------------------------- Exercice 4 -------------------------------------*)
-(*
+
 type regex = Empty | Eps | Char of char | Alt of regex*regex | Concat of regex*regex | Star of regex
 let rec print_regex e = 
   match e with 
@@ -273,4 +272,3 @@ let rec accept exp s =
 
 Printf.printf "%b\n" (accept (Alt(Concat(Char('a'),Concat(Char('b'),Char('c'))), Alt(Concat(Char('a'),Char('d')),Alt(Concat(Char('e'),Concat(Char('f'),Char('g'))),Char('a'))))) ['a';'b';'c']);;
 
-*)
