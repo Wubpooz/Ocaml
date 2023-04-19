@@ -35,6 +35,8 @@ test : *.cmo
 run : $(BINS)
 	./$<
 
+dm : all run
+
 clean:
 	@echo "Cleaning up..."
 	$(RM) *.cmo *.cmi $(BINS)
