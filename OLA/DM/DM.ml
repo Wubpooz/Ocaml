@@ -104,3 +104,6 @@ let decode_mot m a =
     loop m a []
 ;;
 
+List.iter (fun x->Printf.printf "%d" x) (fst (decode_mot [1;0;1] t));Printf.printf "\n";;
+
+(*11*)
