@@ -1,3 +1,5 @@
+(*TODO : refaire qu.10 et MIEUX GERER CE FAILWITH qu.12*)
+
 type arbre = C of char | N of arbre*arbre;;
 
 let rec print_abr a = match a with C(c) -> Printf.printf " %c " c | N(l,r) -> print_abr l; Printf.printf " | "; print_abr r;;
@@ -94,6 +96,20 @@ Printf.printf "code_texte [n;a;s;i;t] : "; List.iter (fun x->Printf.printf "%d" 
 
 
 (*10*)
+(*
+Soit m un mot binaire et Human t un arbre de préfixe binaire. 
+Chaque nœud de l'arbre représente un préfixe de mots binaires. 
+En descendant de la racine de l'arbre vers une feuille, on ajoute des bits au préfixe représenté par le nœud.
+Supposons que 𝑘 et 𝑙 soient deux entiers tels que les 𝑘 premiers bits de m soient le code valide d'un caractère selon l'arbre Human t et les 𝑙 premiers bits de m soient le code valide d'un autre caractère. 
+Sans perte de généralité, supposons que 𝑘 ≤ 𝑙.
+Cela signifie que le préfixe représenté par le nœud correspondant à 𝑘 bits de l'arbre Human t est une feuille et représente un caractère valide. 
+Cependant, le préfixe représenté par le nœud correspondant aux 𝑙 bits de l'arbre n'est pas une feuille, sinon cela signifierait que les 𝑘 premiers bits de m ne représenteraient pas un caractère valide selon l'arbre.
+Comme l'arbre de préfixe binaire ne peut pas avoir deux feuilles identiques avec des préfixes différents, cela signifie que les 𝑙 bits de m ne peuvent pas représenter un autre caractère valide que celui représenté par les 𝑘 premiers bits de m. 
+Par conséquent, il ne peut exister qu'un seul entier 𝑘 tel que les 𝑘 premiers bits de m soient le code valide d'un caractère selon l'arbre Human t.
+**)
+
+
+(*11*)
 let decode_mot m a =
   let rec loop m a car =
     if m=[] then None else
@@ -106,7 +122,7 @@ let decode_mot m a =
 Printf.printf "%c" (match decode_mot [0;0;1;0;1;0] t with None -> 'N' | Some((c,_)) -> (match c with None -> 'N' | Some(c) -> c));Printf.printf "\n";;
 
 
-(*11*)
+(*12*)
 let decode_texte m a =
   let rec loop m a txt =
     match m with
@@ -118,8 +134,45 @@ let decode_texte m a =
 Printf.printf "decode_texte [0;0;1;0;1;0] : "; List.iter (fun x->Printf.printf "%c" x) (decode_texte [0;0;1;1;1;0] t);Printf.printf "\n";;
 
 
-(* MIEUX G2RER CE FAILWITH*)
 
 
+(*13*)
+(*
+On va d'abaord avoir A1 :  |    car d'occurences 1 chacunes, cela donne un sous-arbre de poids 2.
+                          / \  
+                         f  n
 
-(*12*)
+On va ensuite avoir A2 :  |    car d'occurences 2 chacunes, cela donne un sous-arbre de poids 4.
+                         / \
+                        i  A1 
+
+Puis on va avoir A3 :  |    car de poids les plus faibles 2,3<4 => sous-arbre de poids 5.
+                      / \
+                     t  a
+
+On continue avec A4 :  |    car de poids les plus faibles 3,4<5 => sous-arbre de poids 7.
+                      / \
+                     s  A2
+
+Finalement, on a A5 :  |   puisque A3 et A4 sont seuls restants. L'arbre final est de poids 12.
+                      / \
+                     A3  A4
+
+
+A5 : 
+                     |
+                    / \
+                  / \  \
+                 t  a   \
+                       / \
+                      s   \
+                         / \
+                        i   \
+                           / \
+                          f  n
+**)
+
+
+(*14*)
+let rec poids a m =
+  
