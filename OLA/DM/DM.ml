@@ -45,10 +45,10 @@ Au final, on a : O(code_char) = O(loop) + O(contient) = O(h*n) + O(n) = O(h*n). 
 
 (*6*)
 let rec reconnait m a =
-  match m with
-    | [] -> true
-    | 0::q -> (match a with N(l,_) -> reconnait q l | _ -> false)
-    | 1::q -> (match a with N(_,r) -> reconnait q r | _ -> false)
+  match m, a with
+    [], C(_) -> true
+    | 0::q, N(l,_) -> reconnait q l
+    | 1::q, N(_,r) -> reconnait q r
     | _ -> false
 ;;
 
@@ -59,7 +59,7 @@ let rec decode_mot_simple m a =
   if reconnait m a then
     let rec loop m a =
       match m, a with 
-        | [], C(c) -> Some c
+        [], C(c) -> Some c
         | 0::q, N(l,_) -> loop q l
         | 1::q, N(_,r) -> loop q r
         | _ -> None
@@ -103,7 +103,23 @@ let decode_mot m a =
   in 
     loop m a []
 ;;
+Printf.printf "%c" (match decode_mot [0;0;1;0;1;0] t with None -> 'N' | Some((c,_)) -> (match c with None -> 'N' | Some(c) -> c));Printf.printf "\n";;
 
-Printf.printf "%c" (match decode_mot [0;0;1] t with None -> 'N' | Some((c,_)) -> (match c with None -> 'N' | Some(c) -> c));Printf.printf "\n";;
 
 (*11*)
+let decode_texte m a =
+  let rec loop m a txt =
+    match m with
+    [] -> txt
+    | _ -> let tmp = (match decode_mot m a with None -> failwith "Word unrecognized" | Some(c,w)->(c,w)) in loop (snd tmp) a (txt@[match (fst tmp) with None -> 'N' | Some(c)->c])
+  in loop m a []
+;;
+
+Printf.printf "decode_texte [0;0;1;0;1;0] : "; List.iter (fun x->Printf.printf "%c" x) (decode_texte [0;0;1;1;1;0] t);Printf.printf "\n";;
+
+
+(* MIEUX G2RER CE FAILWITH*)
+
+
+
+(*12*)
