@@ -104,6 +104,6 @@ let decode_mot m a =
     loop m a []
 ;;
 
-List.iter (fun x->Printf.printf "%d" x) (fst (decode_mot [1;0;1] t));Printf.printf "\n";;
+Printf.printf "%c" (match decode_mot [0;0;1] t with None -> 'N' | Some((c,_)) -> (match c with None -> 'N' | Some(c) -> c));Printf.printf "\n";;
 
 (*11*)
