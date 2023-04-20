@@ -1,4 +1,4 @@
-(*TODO : refaire qu.10 et MIEUX GERER CE FAILWITH qu.12*)
+(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13*)
 
 type arbre = C of char | N of arbre*arbre;;
 
@@ -170,9 +170,25 @@ A5 :
                         i   \
                            / \
                           f  n
+
+
+Correction : 
+                    |
+                   / \
+                 /    \
+               / \   / \
+              t / \ a   \
+               f  n    / \         
+                      i  s
 **)
 
-
 (*14*)
-let rec poids a m =
-  
+let rec poids a stats = 
+  match a with
+    C(c) -> stats.(Char.code(c))
+    | N(l,r) -> (poids l stats) + (poids r stats)
+;;
+
+Printf.printf "poids t : %d\n" (poids t [|3;1;2;1;3;2|]);;
+
+(*15*)
