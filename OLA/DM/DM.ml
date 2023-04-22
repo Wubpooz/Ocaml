@@ -1,4 +1,4 @@
-(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13*)
+(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13, qu.15 ?*)
 
 type arbre = C of char | N of arbre*arbre;;
 
@@ -182,6 +182,7 @@ Correction :
                       i  s
 **)
 
+
 (*14*)
 let rec poids a stats = 
   match a with
@@ -191,4 +192,27 @@ let rec poids a stats =
 
 Printf.printf "poids t : %d\n" (poids t [|3;1;2;1;3;2|]);;
 
+
 (*15*)
+(*
+type of return  = type of snd (extract_min file) = snd 'a = 'c où 'a =('b*'c)
+type of stats = array of (type of occ) = int array (car occ comp 0)
+Donc on a : int array -> 'c
+**)
+
+
+(*16*)
+(*
+ça peut faire une erreur si file is empty ou si 'a n'est pas un type 'paire' (en plus des erreurs potentielles des fonctions impliquées)
+**)
+
+
+
+
+type 'a tas = E | N of 'a * 'a tas * 'a tas;;
+let ta = N(3, N(4,N(8,E,E),N(5,E,E)),N(6,N(7,E,E),E));;
+(*17*)
+(*
+L'élément minimal d'un tas de Braun est à la racine (conséquence directe de sa définition).
+L'élément maximal, quant à lui, 
+**)
