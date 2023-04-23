@@ -1,4 +1,4 @@
-(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13, qu.15 ?*)
+(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13, qu.15 ?, qu.23, qu.25 ?!?!?*)
 
 type arbre = C of char | N of arbre*arbre;;
 
@@ -192,7 +192,7 @@ let rec poids a stats =
 ;;
 
 Printf.printf "poids t : %d\n" (poids t [|3;1;2;1;3;2|]);;
-*)
+**)
 
 
 (*15*)
@@ -278,3 +278,30 @@ Ainsi, ajoute nous renvoie bien un tas de Braun de taille n+1.
 
 
 (*23*)
+let rec extrait_gauche tas =
+  match tas with
+  | E -> None, E
+  | N(n,E,E) -> Some(n), E
+  | N(n,t1,t2) -> let tmp = extrait_gauche t1 in fst tmp,N(n,snd tmp,t2)
+;;
+
+let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst ex with None-> -1 | Some(n)->n); print_tas (snd ex); Printf.printf "\n";;
+
+
+(*24*)
+(*
+lorsque l'on fusionne deux tas en utilisant la deuxième définition, si n_a <= n_b, le sous-arbre fusionné N(n_b, b1, b2) est ajouté comme l'un des enfants de N(n_a, a1, a2). 
+Cela peut violer la propriété d'ordre car la valeur de N(n_b, b1, b2) peut être supérieure à celle de certains enfants de N(n, a1, a2).
+De même pour le cas n_a > n_b.
+**)
+
+
+(*25*)
+let rec fusion t1 t2 =
+  match t1, t2 with
+  t1, E -> t1
+  | N(n1,t11,t12), N(n2,t21,t22) -> if n1<=n2 then N(n1, N(n2,t21,t22),fusion t11 t22) else N(n2, fusion t21 t22,N(n1,t11,t12))
+  | _ -> failwith "fusion : les deux tas doivent être de taille proche"
+;;
+
+Printf.printf "fusion ta et ta2 : "; print_tas (fusion ta ta2); Printf.printf "\n";;
