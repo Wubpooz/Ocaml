@@ -184,6 +184,7 @@ Correction :
 
 
 (*14*)
+(*
 let rec poids a stats = 
   match a with
     C(c) -> stats.(Char.code(c))
@@ -191,6 +192,7 @@ let rec poids a stats =
 ;;
 
 Printf.printf "poids t : %d\n" (poids t [|3;1;2;1;3;2|]);;
+*)
 
 
 (*15*)
@@ -203,6 +205,7 @@ Donc on a : int array -> 'c
 
 (*16*)
 (*
+
 ça peut faire une erreur si file is empty ou si 'a n'est pas un type 'paire' (en plus des erreurs potentielles des fonctions impliquées)
 **)
 
@@ -210,9 +213,68 @@ Donc on a : int array -> 'c
 
 
 type 'a tas = E | N of 'a * 'a tas * 'a tas;;
+let rec print_tas t = match t with E -> Printf.printf "E" | N(n,t1,t2) -> Printf.printf "N(%d," n; print_tas t1; Printf.printf ","; print_tas t2; Printf.printf ")";;
 let ta = N(3, N(4,N(8,E,E),N(5,E,E)),N(6,N(7,E,E),E));;
+
 (*17*)
 (*
 L'élément minimal d'un tas de Braun est à la racine (conséquence directe de sa définition).
-L'élément maximal, quant à lui, 
+L'élément maximal, quant à lui, n'a pas de position prédéfinie, mais on sait que c'est l'une des feuilles de l'arbre.
 **)
+
+
+(*18*)
+(*
+Il y a 2 tas de Braun de taille 2 :  N(n,m,E)
+Il y a 5 tas de Braun de taille 3 :  N(n,m,N(p,E,E))
+Il y a 14 tas de Braun de taille 4 : N(n,m,N(p,N(q,E,E),E))
+Il y a 42 tas de Braun de taille 5 : N(n,m,N(p,N(q,N(r,E,E),E),E))
+Il y a 132 tas de Braun de taille 6 : N(n,m,N(p,N(q,N(r,N(s,E,E),E),E),E))
+IL y a 429 tas de Braun de taille 7 : N(n,m,N(p,N(q,N(r,N(s,N(t,E,E),E),E),E),E))
+(C'est les nombres de Catalan, OEIS A000108)
+**)
+
+
+(*19*)
+(*
+La hauteur d'un arbre de Braun de taille n est égale à ⌊log2(n+1)⌋ puisque permanentement équilibré.
+**)
+
+
+(*20*)
+let rec ajoute e tas = match tas with E -> N(e,E,E) | N(n,t1,t2) -> if e<=n then N(e,ajoute n t2, t1) else N(n,ajoute e t2, t1);;
+
+Printf.printf "ajoute 2 ta : "; print_tas (ajoute 2 ta); Printf.printf "\n";;
+
+
+(*21*)
+let ta2 = N(2, N(4,N(8,E,E),E),N(6,N(7,E,E),E));;
+Printf.printf "ajoute 3 ta2 : "; print_tas (ajoute 3 ta2); Printf.printf "\n";;
+
+
+(*22*)
+(*
+Soit n la taille d'un tas de Braun, t = N(y,t1,t2) et soit x un élément quelconque de type 'a.
+On pose donc H(n) : "t'=ajoute(x,t) est de taille n+1"
+Initialisation : n=0 -> t=E, ajoute(x,E) = N(x,E,E) qui est de taille 1, donc H(0) est vraie.
+
+Héréditée : Prenons n et supposons H(n) vraie. Prouvons H(n+1).
+On pose t'=ajoute(x,t) et on a soit :
+  - t'=N(x,t1',t2), x<=y, avec t2 de taille n-1 (car t de taille n) et t1' de taille n par hypothèse de récurrence (on fait N(x,ajoute y t2,t1)) . On a donc taille(t') = taille(t1')+1 = n+1.
+  - t'=N(y,t1',t2) avec t2 de taille n-1 (car t de taille n) et t1' de taille n par hypothèse de récurrence (on fait N(y,ajoute x t2, t1)). On a donc taille(t') = taille(t1')+1 = n+1.
+Donc H(n+1) est vraie.
+
+Ainsi, t'=ajoute(_,t) renvoie bien un arbre de taille n+1.
+
+Maintenant, on va prouver que t' est aussi un tas de Braun.
+On veut que t' soit un arbre binaire, équilibré et ordonné.
+ - Arbre binaire : évident (ajoute ne renvoie que des éléments sous la forme N(x,t1,t2), forme d'un arbre binaire)
+ - Ordonné : puisque l'on compare l'élément à ajouter avec l'élement actuellement présent dans le tas à cette position et on l'ajoute à cet endroit ssi il est plus petit, sinon on continue, ll sera donc inséré au bon endroit. Et puisque l'arbre de départ est ordonnée, on le reste.
+ - Équilibré : d'après l'héréditée, t'=N(_,t1',t2) où t1' est de taille n et t2 de taille n-1. Leur différence de taille n'est que de 1 donc t' reste équilibré.
+On a vérifié toutes les critères de la définition, donc t' est un tas de Braun. 
+
+Ainsi, ajoute nous renvoie bien un tas de Braun de taille n+1.
+**)
+
+
+(*23*)
