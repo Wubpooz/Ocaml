@@ -1,4 +1,4 @@
-(*TODO : refaire qu.10, MIEUX GERER CE FAILWITH qu.12, qu.13, qu.15 ?, qu.23, qu.25 ?!?!?*)
+(*TODO : refaire qu.10, qu.13, qu.15 ?, qu.25 ?!?!?*)
 
 type arbre = C of char | N of arbre*arbre;;
 
@@ -278,14 +278,16 @@ Ainsi, ajoute nous renvoie bien un tas de Braun de taille n+1.
 
 
 (*23*)
-let rec extrait_gauche tas =
+
+
+let rec extrait_gauche (tas: int tas) : int option * int tas =
   match tas with
-  | E -> None, E
-  | N(n,E,E) -> Some(n), E
-  | N(n,t1,t2) -> let tmp = extrait_gauche t1 in fst tmp,N(n,snd tmp,t2)
+  | E -> (None, E)
+  | N(n,E,t2) -> (Some(n), t2)
+  | N(n,t1,t2) -> let tmp = extrait_gauche t1 in (fst tmp, N(n,t2,snd tmp))
 ;;
 
-let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst ex with None-> -1 | Some(n)->n); print_tas (snd ex); Printf.printf "\n";;
+let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst ex with None -> -1 | Some(n) -> n); print_tas (snd ex); Printf.printf "\n";;
 
 
 (*24*)
