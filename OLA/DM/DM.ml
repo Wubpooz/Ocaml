@@ -1,20 +1,20 @@
-(*TODO : refaire qu.10, qu.13, qu.15 ?, qu.25 ?!?!?*)
+(*-------------------------------------------- I. Arbre de Huffman -------------------------------------------- *)
 
 type arbre = C of char | N of arbre*arbre;;
-
+type mot = int list;;
 let rec print_abr a = match a with C(c) -> Printf.printf " %c " c | N(l,r) -> print_abr l; Printf.printf " | "; print_abr r;;
 let print_abr a = print_abr a; Printf.printf "\n";;
-
-type mot = int list;;
 
 
 (*1*)
 let t = N(N(N(C('n'),C('f')),C('a')),N(C('s'),N(C('i'),C('t'))));;
 print_abr t;;
 
+
 (*2*)
 let rec taille a = match a with C(c) -> 1 | N(l,r) -> 1 + taille l + taille r;;
 Printf.printf "taille : %d\n" (taille t);;
+
 
 (*3*)
 let rec contient c a = 
@@ -22,7 +22,9 @@ let rec contient c a =
   C(car) -> car=c 
   | N(l,r) -> contient c l || contient c r
 ;;
+
 Printf.printf "contient f : %b\n" (contient 'f' t);;
+
 
 (*4*)
 let code_char c a = if not(contient c a) then failwith "not in this tree" 
@@ -35,7 +37,9 @@ let code_char c a = if not(contient c a) then failwith "not in this tree"
     in 
       loop c a []
 ;;
+
 List.iter (fun x->Printf.printf "%d" x) (code_char 'i' t);Printf.printf "\n";;
+
 
 (*5*)
 (*
@@ -44,6 +48,7 @@ La complexité de contient est de O(n) car on parcourt l'arbre entier.
 loop appelle contient à chaque recursion et "tourne" au max la hauteur de l'arbre fois donc est en O(h)*O(contient) = O(h*n). 
 Au final, on a : O(code_char) = O(loop) + O(contient) = O(h*n) + O(n) = O(h*n). (h est au pire = n-1 mais on considérera que h<<n, cas d'un arbre équilibré)
 **)
+
 
 (*6*)
 let rec reconnait m a =
@@ -55,6 +60,7 @@ let rec reconnait m a =
 ;;
 
 Printf.printf "reconnait [0;1;1] : %b\n" (reconnait [1;1;0] t);;
+
 
 (*7*)
 let rec decode_mot_simple m a = 
@@ -72,6 +78,7 @@ let rec decode_mot_simple m a =
 
 Printf.printf "decode_mot_simple [1;0;1] : %s \n" (match decode_mot_simple [1;0;0] t with Some(c) -> String.make 1 c | None -> "None");;
 
+
 (*8*)
 (*
 La complexité de decode_mot_simple est de O(reconnait) + O(loop).
@@ -81,6 +88,7 @@ Au final, on a : O(decode_mot_simple) = O(reconnait) + O(loop) = O(h) + O(h) = O
 **)
 
 
+(*-------------------------------------------- II. Codage d'un texte entier --------------------------------------------*)
 
 
 (*9*)
@@ -97,15 +105,18 @@ Printf.printf "code_texte [n;a;s;i;t] : "; List.iter (fun x->Printf.printf "%d" 
 
 (*10*)
 (*
-Soit m un mot binaire et Human t un arbre de préfixe binaire. 
-Chaque nœud de l'arbre représente un préfixe de mots binaires. 
-En descendant de la racine de l'arbre vers une feuille, on ajoute des bits au préfixe représenté par le nœud.
-Supposons que 𝑘 et 𝑙 soient deux entiers tels que les 𝑘 premiers bits de m soient le code valide d'un caractère selon l'arbre Human t et les 𝑙 premiers bits de m soient le code valide d'un autre caractère. 
-Sans perte de généralité, supposons que 𝑘 ≤ 𝑙.
-Cela signifie que le préfixe représenté par le nœud correspondant à 𝑘 bits de l'arbre Human t est une feuille et représente un caractère valide. 
-Cependant, le préfixe représenté par le nœud correspondant aux 𝑙 bits de l'arbre n'est pas une feuille, sinon cela signifierait que les 𝑘 premiers bits de m ne représenteraient pas un caractère valide selon l'arbre.
-Comme l'arbre de préfixe binaire ne peut pas avoir deux feuilles identiques avec des préfixes différents, cela signifie que les 𝑙 bits de m ne peuvent pas représenter un autre caractère valide que celui représenté par les 𝑘 premiers bits de m. 
-Par conséquent, il ne peut exister qu'un seul entier 𝑘 tel que les 𝑘 premiers bits de m soient le code valide d'un caractère selon l'arbre Human t.
+Soient un mot m et un arbre de Huffman t.
+Analyse : (unicité)
+Supposons qu'il existe un entier k, maximal, tel que les k premiers bits de m soient le code valide d'un caractère, c, de t.
+On peut noter alors m' le mot m privé de ses k premiers bits. Si m' contient un caractère valide de t, on note k' le nombre de bits de ce caractère.
+On a alors que les k'+k premiers bits de m sont le code valide d'un caractère de t. Or k'+k>k, ce qui est absurde.
+Donc il n'existe pas de k tel que les k premiers bits de m soient le code valide d'un caractère de t. 
+
+Synthèse : (existence faible)
+On a que soit m n'est pas un mot valide (ne commence par aucun caractère de t) et donc k n'existe par définition (d'où le 'au plus').
+Soit que m est un mot valide et donc qu'il y a au moins un caractère c de t qui commence par les k premiers bits de m.
+
+Ainsi, on a qu'il existe au plus un k tel que les k premiers bits de m soient le code valide d'un caractère de t.
 **)
 
 
@@ -134,52 +145,41 @@ let decode_texte m a =
 Printf.printf "decode_texte [0;0;1;0;1;0] : "; List.iter (fun x->Printf.printf "%c" x) (decode_texte [0;0;1;1;1;0] t);Printf.printf "\n";;
 
 
+(*-------------------------------------------- III. Construction de l'arbre de Huffman --------------------------------------------*)
 
 
 (*13*)
 (*
 On va d'abaord avoir A1 :  |    car d'occurences 1 chacunes, cela donne un sous-arbre de poids 2.
                           / \  
-                         f  n
+                         f  i
 
-On va ensuite avoir A2 :  |    car d'occurences 2 chacunes, cela donne un sous-arbre de poids 4.
+On va ensuite avoir A2 :  |    car d'occurences 1 et 2, cela donne un sous-arbre de poids 3.
                          / \
-                        i  A1 
+                        t  n 
 
-Puis on va avoir A3 :  |    car de poids les plus faibles 2,3<4 => sous-arbre de poids 5.
+Puis on va avoir A3 :  |    car de poids les plus faibles 2,3<=3 => sous-arbre de poids 5.
                       / \
-                     t  a
+                     A1  A2
 
-On continue avec A4 :  |    car de poids les plus faibles 3,4<5 => sous-arbre de poids 7.
+On continue avec A4 :  |    car de poids les plus faibles 3,3<5 => sous-arbre de poids 6.
                       / \
-                     s  A2
+                     a  s
 
-Finalement, on a A5 :  |   puisque A3 et A4 sont seuls restants. L'arbre final est de poids 12.
+Finalement, on a A5 :  |   puisque A3 et A4 sont seuls restants. L'arbre final est de poids 11.
                       / \
-                     A3  A4
+                     A2  A4
 
 
 A5 : 
                      |
                     / \
-                  / \  \
-                 t  a   \
-                       / \
-                      s   \
-                         / \
-                        i   \
-                           / \
-                          f  n
-
-
-Correction : 
-                    |
-                   / \
-                 /    \
-               / \   / \
-              t / \ a   \
-               f  n    / \         
-                      i  s
+                  /    \
+                / \    /\
+               a   s  /  \
+                     /    \     
+                   / \   / \        
+                  f  i  t  n
 **)
 
 
@@ -197,24 +197,31 @@ Printf.printf "poids t : %d\n" (poids t [|3;1;2;1;3;2|]);;
 
 (*15*)
 (*
-type of return  = type of snd (extract_min file) = snd 'a = 'c où 'a =('b*'c)
-type of stats = array of (type of occ) = int array (car occ comp 0)
-Donc on a : int array -> 'c
+Posons $var := le type de var dans ce qui suit :
+
+huffman : $stats -> snd $(extract_min $(file)) 
+        : $occ array -> snd $(extract_min 'a prio)     (car occ comp 0 et $0 : int)
+        : int array -> snd 'a
+huffman : int array -> 'c                              (où 'a = 'c * 'd)
+
+On peut supposer que 'c = arbre.
 **)
 
 
 (*16*)
 (*
-
-ça peut faire une erreur si file is empty ou si 'a n'est pas un type 'paire' (en plus des erreurs potentielles des fonctions impliquées)
+Ça peut faire une erreur si file is empty ou si 'a n'est pas un type 'paire' (en plus des erreurs potentielles des fonctions impliquées)
 **)
 
 
+
+(*-------------------------------------------- IV. Tas de Braun --------------------------------------------*)
 
 
 type 'a tas = E | N of 'a * 'a tas * 'a tas;;
 let rec print_tas t = match t with E -> Printf.printf "E" | N(n,t1,t2) -> Printf.printf "N(%d," n; print_tas t1; Printf.printf ","; print_tas t2; Printf.printf ")";;
 let ta = N(3, N(4,N(8,E,E),N(5,E,E)),N(6,N(7,E,E),E));;
+
 
 (*17*)
 (*
@@ -278,8 +285,6 @@ Ainsi, ajoute nous renvoie bien un tas de Braun de taille n+1.
 
 
 (*23*)
-
-
 let rec extrait_gauche (tas: int tas) : int option * int tas =
   match tas with
   | E -> (None, E)
@@ -292,9 +297,30 @@ let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst
 
 (*24*)
 (*
-lorsque l'on fusionne deux tas en utilisant la deuxième définition, si n_a <= n_b, le sous-arbre fusionné N(n_b, b1, b2) est ajouté comme l'un des enfants de N(n_a, a1, a2). 
-Cela peut violer la propriété d'ordre car la valeur de N(n_b, b1, b2) peut être supérieure à celle de certains enfants de N(n, a1, a2).
-De même pour le cas n_a > n_b.
+- arbre binaire : par définition (N(_,t1,t2) est un arbre binaire), fusion renvoie un arbre binaire.
+- équilibré : 
+  • fusion(a,E) -> renvoie a, n'est équilibré que ssi a est équilibré (vrai car a tas de Braun, précondition)
+  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, équilibré ssi fusion t1 t2 est équilibré
+  • N(n2,fusion t3 t4,N(n1,t1,t2)) sinon, équilibré ssi fusion t3 t4 est équilibré
+  On pourrait facilement prouver par une récurrence structurelle que fusion est équilibré (on a notre cas de bas et notre héréditée déjà faites).
+- ordonné : 
+  • fusion(a,E) -> renvoie a, ordonné ssi a est ordonné (vrai car a tas de Braun, précondition)
+  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, ordonné ssi fusion t1 t2 est ordonné
+  • N(n2,fusion t3 t4,N(n1,t1,t2)) sinon, ordonné ssi fusion t3 t4 est ordonné
+  On pourrait facilement prouver par une récurrence structurelle que fusion est ordonné (on a notre cas de bas et notre héréditée déjà faites).
+
+=> PAS DE PROBLEME DONC PROBLEME  
+//lorsque l'on fusionne deux tas en utilisant la deuxième définition, si n_a <= n_b, le sous-arbre fusionné N(n_b, b1, b2) est ajouté comme l'un des enfants de N(n_a, a1, a2). 
+//Cela peut violer la propriété d'ordre car la valeur de N(n_b, b1, b2) peut être supérieure à celle de certains enfants de N(n, a1, a2).
+//De même pour le cas n_a > n_b.
+
+Exemple de fusion de deux tas de Braun
+t1 = N(1,N(2,E,E),N(3,N(4,E,E),E))
+t2 = N(5,N(6,E,E),N(7,E,E))
+
+1) 1<5 -> N(1, N(5,N(6,E,E),N(7,E,E)), fusion N(2,E,E) N(3,N(4,E,E),E))
+2) 2<3 -> N(2,N(3,N(4,E,E),E),E)
+fusion t1 t2 = N(1,N(5,N(6,E,E),N(7,E,E)),N(2,N(3,N(4,E,E),E),E))
 **)
 
 
@@ -302,7 +328,7 @@ De même pour le cas n_a > n_b.
 let rec fusion t1 t2 =
   match t1, t2 with
   t1, E -> t1
-  | N(n1,t11,t12), N(n2,t21,t22) -> if n1<=n2 then N(n1, N(n2,t21,t22),fusion t11 t22) else N(n2, fusion t21 t22,N(n1,t11,t12))
+  | N(n1,t11,t12),N(n2,t21,t22) -> if n1<=n2 then N(n1, N(n2,t21,t22),fusion t11 t22) else N(n2, fusion t21 t22,N(n1,t11,t12))
   | _ -> failwith "fusion : les deux tas doivent être de taille proche"
 ;;
 
