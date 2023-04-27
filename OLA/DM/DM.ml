@@ -302,17 +302,13 @@ let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst
   • fusion(a,E) -> renvoie a, n'est équilibré que ssi a est équilibré (vrai car a tas de Braun, précondition)
   • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, équilibré ssi fusion t1 t2 est équilibré
   • N(n2,fusion t3 t4,N(n1,t1,t2)) sinon, équilibré ssi fusion t3 t4 est équilibré
-  On pourrait facilement prouver par une récurrence structurelle que fusion est équilibré (on a notre cas de bas et notre héréditée déjà faites).
+  On pourrait facilement prouver par une récurrence structurelle que fusion est équilibré (on a notre cas de bas et notre héréditée déjà faites, on a aussi que a et b sont équilibrés entre eux, précondition).
 - ordonné : 
   • fusion(a,E) -> renvoie a, ordonné ssi a est ordonné (vrai car a tas de Braun, précondition)
-  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, ordonné ssi fusion t1 t2 est ordonné
-  • N(n2,fusion t3 t4,N(n1,t1,t2)) sinon, ordonné ssi fusion t3 t4 est ordonné
-  On pourrait facilement prouver par une récurrence structurelle que fusion est ordonné (on a notre cas de bas et notre héréditée déjà faites).
+  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, 
 
-=> PAS DE PROBLEME DONC PROBLEME  
-//lorsque l'on fusionne deux tas en utilisant la deuxième définition, si n_a <= n_b, le sous-arbre fusionné N(n_b, b1, b2) est ajouté comme l'un des enfants de N(n_a, a1, a2). 
-//Cela peut violer la propriété d'ordre car la valeur de N(n_b, b1, b2) peut être supérieure à celle de certains enfants de N(n, a1, a2).
-//De même pour le cas n_a > n_b.
+ 
+
 
 Exemple de fusion de deux tas de Braun
 t1 = N(1,N(2,E,E),N(3,N(4,E,E),E))
