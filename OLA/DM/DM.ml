@@ -27,13 +27,13 @@ Printf.printf "contient f : %b\n" (contient 'f' t);;
 
 
 (*4*)
-let code_char c a = if not(contient c a) then failwith "not in this tree" 
+let code_char c a = if not(contient c a) then failwith "caractère non présent dans l'arbre" 
   else 
     let rec loop c a code =
       match a with
         | C(car) when car=c -> code
         | N(l,r) -> if(contient c l) then loop c l (code@[0]) else loop c r (code@[1])
-        | _ -> failwith "wtf"
+        | _ -> failwith "caractère non présent dans l'arbre, erreur du code de la fonction contient"
     in 
       loop c a []
 ;;
@@ -138,7 +138,7 @@ let decode_texte m a =
   let rec loop m a txt =
     match m with
     [] -> txt
-    | _ -> let tmp = (match decode_mot m a with None -> failwith "Word unrecognized" | Some(c,w)->(c,w)) in loop (snd tmp) a (txt@[match (fst tmp) with None -> 'N' | Some(c)->c])
+    | _ -> let tmp = (match decode_mot m a with None -> (None,[]) (*ou failwith "Mot inconnu"*) | Some(c,w)->(c,w)) in loop (snd tmp) a (txt@[match (fst tmp) with None -> 'N' | Some(c)->c])
   in loop m a []
 ;;
 
@@ -220,6 +220,7 @@ On peut supposer que 'c = arbre.
 
 type 'a tas = E | N of 'a * 'a tas * 'a tas;;
 let rec print_tas t = match t with E -> Printf.printf "E" | N(n,t1,t2) -> Printf.printf "N(%d," n; print_tas t1; Printf.printf ","; print_tas t2; Printf.printf ")";;
+let rec taille t = match t with E -> 0 | N(_,t1,t2) -> 1 + (taille t1) + (taille t2);;
 let ta = N(3, N(4,N(8,E,E),N(5,E,E)),N(6,N(7,E,E),E));;
 
 
@@ -285,7 +286,7 @@ Ainsi, ajoute nous renvoie bien un tas de Braun de taille n+1.
 
 
 (*23*)
-let rec extrait_gauche (tas: int tas) : int option * int tas =
+let rec extrait_gauche (tas: 'a tas) : 'a option * 'a tas =
   match tas with
   | E -> (None, E)
   | N(n,E,t2) -> (Some(n), t2)
@@ -298,16 +299,17 @@ let ex = extrait_gauche ta in Printf.printf "extrait_gauche ta : %d " (match fst
 (*24*)
 (*
 - arbre binaire : par définition (N(_,t1,t2) est un arbre binaire), fusion renvoie un arbre binaire.
-- équilibré : 
-  • fusion(a,E) -> renvoie a, n'est équilibré que ssi a est équilibré (vrai car a tas de Braun, précondition)
-  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, équilibré ssi fusion t1 t2 est équilibré
-  • N(n2,fusion t3 t4,N(n1,t1,t2)) sinon, équilibré ssi fusion t3 t4 est équilibré
-  On pourrait facilement prouver par une récurrence structurelle que fusion est équilibré (on a notre cas de bas et notre héréditée déjà faites, on a aussi que a et b sont équilibrés entre eux, précondition).
 - ordonné : 
+  • fusion(a,E) -> renvoie a, n'est ordonné que ssi a est ordonné (vrai car a tas de Braun, précondition)
+  • fusion(N(n_a,t_a1,t_a2),N(n_b,t_b1,t_b2)) -> renvoie N(n_a,N(n_b,t_b1,t_b2),fusion t_a1 t_a2) si n_a<=n_b, ordonné ssi fusion t_a1 t_a2 est ordonné
+  • N(n_b,fusion t_b1 t_b2,N(n_a,t_a1,t_a2)) sinon, ordonné ssi fusion t_b1 t_b2 est ordonné
+  On pourrait facilement prouver par une récurrence structurelle que fusion est ordonné (on a notre cas de bas et notre héréditée déjà faites)
+- équilibré : On choisis A de taille n et B de taille n ou n-1
   • fusion(a,E) -> renvoie a, ordonné ssi a est ordonné (vrai car a tas de Braun, précondition)
-  • fusion(N(n1,t1,t2),N(n2,t3,t4)) -> renvoie N(n1,N(n2,t3,t4),fusion t1 t2) si n1<=n2, 
+  • fusion(N(n_a,t_a1,t_a2),N(n_b,t_b1,t_b2)) -> renvoie N(n_a,N(n_b,t_b1,t_b2),fusion t_a1 t_a2) si n_a<=n_b, N(n_b,t_b1,t_b2) est de taille n ou n-1 car B de taille n-1, fusion t_a1 t_a2 est de taille n-1 par récurrence => équilibré
+  • N(n_b,fusion t_b1 t_b2,N(n_a,t_a1,t_a2)) sinon, fusion t_b1 t_b2 est de taille n-1 ou n-2 par récurrence, N(n_a,t_a1,t_a2) est de taille n => PROBLEME car n-2 est à plus de 1 de n
 
- 
+Cette définition de la fusion ne marche donc pas forcément.
 
 
 Exemple de fusion de deux tas de Braun
@@ -324,8 +326,20 @@ fusion t1 t2 = N(1,N(5,N(6,E,E),N(7,E,E)),N(2,N(3,N(4,E,E),E),E))
 let rec fusion t1 t2 =
   match t1, t2 with
   t1, E -> t1
-  | N(n1,t11,t12),N(n2,t21,t22) -> if n1<=n2 then N(n1, N(n2,t21,t22),fusion t11 t22) else N(n2, fusion t21 t22,N(n1,t11,t12))
+  | N(n1,t11,t12),N(n2,t21,t22) when n1<=n2 -> N(n1, N(n2,t21,t22),fusion t11 t22) 
+  | N(n1,t11,t12),N(n2,t21,t22) -> let f = fusion t21 t22 in let tt = N(n1,t11,t12) in if taille tt>taille f +1 then let tt' = extrait_gauche tt in  N(n2,ajoute (match fst tt' with None -> failwith "fusion : tas vide"| Some(c)-> c) f ,snd tt') else N(n2,f,tt)
   | _ -> failwith "fusion : les deux tas doivent être de taille proche"
 ;;
 
-Printf.printf "fusion ta et ta2 : "; print_tas (fusion ta ta2); Printf.printf "\n";;
+let rec fusion2 t1 t2 = (* devrait être la même fonction mais un peu plus lisible et performante car pas d'instruction de branchement et pas d'appel à taille*)
+  match t1, t2 with
+  t1, E -> t1
+  | N(n1,t11,t12),N(n2,t21,t22) when n1<=n2 -> N(n1, N(n2,t21,t22),fusion t11 t22) 
+  | N(n1,t11,t12),N(n2,t21,t22) -> let f = fusion t21 t22 in let tt = extrait_gauche (N(n1,t11,t12)) in  N(n2,ajoute (match fst tt with None -> failwith "fusion : tas vide"| Some(c)-> c) f , snd tt)
+  | _ -> failwith "fusion : les deux tas doivent être de taille proche"
+;;
+
+let ta2 = N(1, N(7,N(34,E,E),E),N(18,N(21,E,E),E));;
+let ta3 = N(12,N(13,E,E),N(14,E,E));;
+Printf.printf "fusion ta et ta2 : "; print_tas (fusion ta ta3); Printf.printf "\n";;
+Printf.printf "fusion ta et ta3 : "; print_tas (fusion2 ta ta3); Printf.printf "\n";;
