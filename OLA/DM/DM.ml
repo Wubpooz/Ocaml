@@ -152,34 +152,35 @@ Printf.printf "decode_texte [0;0;1;0;1;0] : "; List.iter (fun x->Printf.printf "
 (*
 On va d'abaord avoir A1 :  |    car d'occurences 1 chacunes, cela donne un sous-arbre de poids 2.
                           / \  
-                         f  i
+                         n  f
 
-On va ensuite avoir A2 :  |    car d'occurences 1 et 2, cela donne un sous-arbre de poids 3.
+On va ensuite avoir A2 :  |    car d'occurences 2 chacunes, cela donne un sous-arbre de poids 4.
                          / \
-                        t  n 
+                        i  t 
 
 Puis on va avoir A3 :  |    car de poids les plus faibles 2,3<=3 => sous-arbre de poids 5.
                       / \
-                     A1  A2
+                     A1  a
 
-On continue avec A4 :  |    car de poids les plus faibles 3,3<5 => sous-arbre de poids 6.
+On continue avec A4 :  |    car de poids les plus faibles 3,4<5 => sous-arbre de poids 7.
                       / \
-                     a  s
+                     s  A2
 
-Finalement, on a A5 :  |   puisque A3 et A4 sont seuls restants. L'arbre final est de poids 11.
+Finalement, on a A5 :  |   puisque A3 et A4 sont seuls restants. L'arbre final est de poids 12.
                       / \
-                     A2  A4
+                     A3  A4
 
 
 A5 : 
-                     |
-                    / \
-                  /    \
-                / \    /\
-               a   s  /  \
-                     /    \     
-                   / \   / \        
-                  f  i  t  n
+                      |
+                     / \ 
+                    /   \
+                  /      \
+                / \      /\
+               /   \    /  \
+              /    a   s    \
+            / \            / \
+           n  f           i  t
 **)
 
 
