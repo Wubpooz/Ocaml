@@ -243,8 +243,17 @@ Il y a 132 tas de Braun de taille 6 : N(n,m,N(p,N(q,N(r,N(s,E,E),E),E),E))
 IL y a 429 tas de Braun de taille 7 : N(n,m,N(p,N(q,N(r,N(s,N(t,E,E),E),E),E),E))
 (C'est les nombres de Catalan, OEIS A000108)
 
-Si l'on ne regarde que la forme maintenant, on a :
-1 tas de Braun de taille 2 : N(_,_,E) et N(_,E,_)
+Si l'on ne regarde que la forme maintenant, on a : OEIS A110316
+2 tas de Braun de taille 2 :  N(_,_,E) et N(_,E,_)
+1 tas de Braun de taille 3 :  N(_,_,_)
+4 tas de Braun de taille 4 :  N(_,N(_,_,E),_), N(_,N(_,E,_),_), N(_,_,N(_,_,E)) et N(_,_,N(_,E,_))
+4 tas de Braun de taille 5 :  N(_N(_,_,E),N(_,E,_))...
+4 tas de Braun de taille 6 :  N(_N(_,_,_),N(_,E,_))...
+1 tas de Braun de taille 7 :  N(_N(_,_,_),N(_,_,_))...
+
+On rempli le bas de l'arbre autant que possible avec toujours une puissance de deux possibilités ; on n'a plus qu'une possibilité quand le tas est rempli.
+On trouve la formule : a(0) = a(1) = 1  et  a(2*n) = 2*a(n)*a(n-1) | a(2*n+1) = a(n)*a(n).
+(OEIS A110316 | preuve : https://notatt.com/btree-shapes.pdf)
 **)
 
 
