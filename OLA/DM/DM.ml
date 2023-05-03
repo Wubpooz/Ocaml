@@ -234,6 +234,7 @@ L'élément maximal, quant à lui, n'a pas de position prédéfinie, mais on sai
 
 (*18*)
 (*
+Premièrement, si on regarde aussi les nombres portés par les noeux on a, par permutations :
 Il y a 2 tas de Braun de taille 2 :  N(n,m,E)
 Il y a 5 tas de Braun de taille 3 :  N(n,m,N(p,E,E))
 Il y a 14 tas de Braun de taille 4 : N(n,m,N(p,N(q,E,E),E))
@@ -241,6 +242,9 @@ Il y a 42 tas de Braun de taille 5 : N(n,m,N(p,N(q,N(r,E,E),E),E))
 Il y a 132 tas de Braun de taille 6 : N(n,m,N(p,N(q,N(r,N(s,E,E),E),E),E))
 IL y a 429 tas de Braun de taille 7 : N(n,m,N(p,N(q,N(r,N(s,N(t,E,E),E),E),E),E))
 (C'est les nombres de Catalan, OEIS A000108)
+
+Si l'on ne regarde que la forme maintenant, on a :
+1 tas de Braun de taille 2 : N(_,_,E) et N(_,E,_)
 **)
 
 
