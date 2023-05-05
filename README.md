@@ -1,7 +1,10 @@
 ## References
 https://www-apr.lip6.fr/~chaillou/Public/DA-OCAML/  (App Dev)  
-pauillac.inria.fr/~remy/cours/appsem/  (general)
+pauillac.inria.fr/~remy/cours/appsem/  (general)  
 gallium.inria.fr/~remy/camlunix/ (Unix creation)  
+
+## Techniques
+- Result/Option type  
 
 ## Debugging
 ### Guide to debugging in OCaml
